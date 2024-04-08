@@ -25,3 +25,16 @@ app.get("/urls", (req, res) => {
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
+
+app.get("/urls/:id", (req, res) => {
+  const id = req.params.id;
+  const longURL = urlDatabase[id]; // Assuming urlDatabase is your object mapping short URLs to long URLs
+
+  if (longURL) {
+    const templateVars = { id: id, longURL: longURL };
+    res.render("urls_show", templateVars);
+  } else {
+    // Handle case where id doesn't exist in the database
+    res.status(404).send("URL not found");
+  }
+});
