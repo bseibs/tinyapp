@@ -28,7 +28,7 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
-  const longURL = urlDatabase[id]; // Assuming urlDatabase is your object mapping short URLs to long URLs
+  const longURL = urlDatabase[id];
 
   if (longURL) {
     const templateVars = { id: id, longURL: longURL };
