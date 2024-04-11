@@ -70,6 +70,19 @@ app.get("/urls/:id", (req, res) => {
   }
 });
 
+// Redirect any request to "/u/:id" to its longURL
+
+app.get("/u/:id", (req, res) => {
+  const id = req.params.id;
+  const longURL = urlDatabase[id];
+
+  if (longURL) {
+    res.redirect(longURL); // Redirect to the longURL
+  } else {
+    res.status(404).send("URL not found");
+  }
+});
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
