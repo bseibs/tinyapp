@@ -97,6 +97,22 @@ app.post("/urls/:id/delete", (req, res) => {
     res.status(404).send("URL not found");
   }
 });
+// POST route to update a URL resource
+app.post("/urls/:id", (req, res) => {
+  const id = req.params.id;
+  const newLongURL = req.body.longURL;
+
+  // Check if the URL exists in the database
+  if (urlDatabase[id]) {
+    // Update the value of the stored long URL based on the new value in req.body
+    urlDatabase[id] = newLongURL;
+    // Redirect the client back to /urls
+    res.redirect("/urls");
+  } else {
+    // If the URL doesn't exist, send a 404 error response
+    res.status(404).send("URL not found");
+  }
+});
 
 // Start the server
 app.listen(PORT, () => {
