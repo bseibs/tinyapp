@@ -82,6 +82,21 @@ app.get("/u/:id", (req, res) => {
     res.status(404).send("URL not found");
   }
 });
+// POST route to handle deletion of a URL resource
+app.post("/urls/:id/delete", (req, res) => {
+  const id = req.params.id;
+
+  // Check if the URL exists in the database
+  if (urlDatabase[id]) {
+    // Use JavaScript's delete operator to remove the URL
+    delete urlDatabase[id];
+    // Redirect the client back to the urls_index page ("/urls")
+    res.redirect("/urls");
+  } else {
+    // If the URL doesn't exist, send a 404 error response
+    res.status(404).send("URL not found");
+  }
+});
 
 // Start the server
 app.listen(PORT, () => {
