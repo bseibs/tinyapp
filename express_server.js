@@ -113,6 +113,16 @@ app.post("/urls/:id", (req, res) => {
     res.status(404).send("URL not found");
   }
 });
+// POST route to handle login
+app.post("/login", (req, res) => {
+  const username = req.body.username; // Get the username from the request body
+
+  // Set the cookie named "username" to the value submitted in the request body
+  res.cookie("username", username);
+
+  // Redirect the browser back to the /urls page
+  res.redirect("/urls");
+});
 
 // Start the server
 app.listen(PORT, () => {
