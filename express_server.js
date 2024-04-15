@@ -123,6 +123,13 @@ app.post("/login", (req, res) => {
   // Redirect the browser back to the /urls page
   res.redirect("/urls");
 });
+app.get("/urls", (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"],
+    // ... any other vars
+  };
+  res.render("urls_index", templateVars);
+});
 
 // Start the server
 app.listen(PORT, () => {
