@@ -130,6 +130,14 @@ app.get("/urls", (req, res) => {
   };
   res.render("urls_index", templateVars);
 });
+// POST route to handle logout
+app.post("/logout", (req, res) => {
+  // Clear the username cookie
+  res.clearCookie("username");
+
+  // Redirect the user back to the /urls page
+  res.redirect("/urls");
+});
 
 // Start the server
 app.listen(PORT, () => {
