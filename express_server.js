@@ -43,6 +43,15 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
+// Route to render login page
+app.get("/login", (req, res) => {
+  if (req.cookies.username) {
+    res.redirect(`/urls`);
+  } else {
+    res.render(`login`);
+  }
+});
+
 // Route to render homepage
 app.get("/", (req, res) => {
   if (req.cookies.username) {
