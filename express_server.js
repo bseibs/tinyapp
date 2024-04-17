@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const PORT = 8080;
+const cookieParser = require("cookie-parser");
 
 // Function to generate a random alphanumeric string
 function generateRandomString(length) {
@@ -19,6 +20,7 @@ app.set("view engine", "ejs");
 
 // Middleware to parse URL-encoded bodies
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // URL database
 const urlDatabase = {
@@ -43,7 +45,11 @@ app.post("/urls", (req, res) => {
 
 // Route to render homepage
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  if (req.cookies.username) {
+    res.redirect(`/urls`);
+  } else {
+    res.redirect(`/login`);
+  }
 });
 
 // Route to render list of URLs
