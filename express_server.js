@@ -73,7 +73,42 @@ app.get("/", (req, res) => {
   }
 });
 // Route to render a register page
+app.get("/register", (req, res) => {
+  if (req.session.username) {
+    res.redirect(`/urls`);
+  } else {
+    res.render(`register`);
+  }
+});
 
+// POST route to handle the registration
+app.post("/register", (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  if (!email || !password) {
+    return res.end("Error, you must enter a valid email or password");
+  }
+  let foundUser;
+  for (userId in users) {
+    const user = users[userId];
+    //Check if the user exists by email
+    if (user.email === email) {
+      foundUser = user;
+    }
+  }
+  if (foundUser) {
+    return res.end("User already exists, please login");
+  }
+  const newUser = {
+    ID: generateRandomString(6),
+    email: email,
+    password: bcrypt.hashSync(password),
+  };
+  users[newUser.ID] = newUser;
+  req.session.username = email;
+  console.log(users);
+  res.redirect("/urls");
+});
 // Middleware to check if the user is logged in
 app.use((req, res, next) => {
   res.locals.loggedIn = !!req.session.username;
