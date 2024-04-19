@@ -38,6 +38,14 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
+const userId1 = generateRandomString(6);
+const userId2 = generateRandomString(6);
+// Users storge
+const users = {
+  [userId1]: { ID: userId1, email: "brandt@gmail.com", password: "tinyapp1" },
+  [userId2]: { ID: userId2, email: "seibel@gmail.com", password: "tinyapp2" },
+};
+
 // Route to render login page
 app.get("/login", (req, res) => {
   if (req.session.username) {
@@ -136,13 +144,24 @@ app.post("/urls/:id", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-
-  // Here you would typically validate the email and password
-  // For now, let's just set a cookie with the username/email
-  req.session.username = email;
-
-  // Redirect to /urls after successful login
-  res.redirect("/urls");
+  let foundUser;
+  for (userId in users) {
+    const user = users[userId];
+    //Check if the user exists by email
+    if (user.email === email) {
+      foundUser = user;
+      if (user.password === password) {
+        req.session.username = email;
+        // Redirect to /urls after successful login
+        return res.redirect("/urls");
+      }
+    }
+  }
+  if (foundUser) {
+    res.end("Error: Password does not match");
+  } else {
+    res.end("Error: User does not exist");
+  }
 });
 
 // POST route to handle logout
