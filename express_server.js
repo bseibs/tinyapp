@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 8080;
 const cookieSession = require("cookie-session");
+const bcrypt = require("bcryptjs");
 
 // Function to generate a random alphanumeric string
 function generateRandomString(length) {
@@ -40,10 +41,18 @@ const urlDatabase = {
 
 const userId1 = generateRandomString(6);
 const userId2 = generateRandomString(6);
-// Users storge
+// Users Database
 const users = {
-  [userId1]: { ID: userId1, email: "brandt@gmail.com", password: "tinyapp1" },
-  [userId2]: { ID: userId2, email: "seibel@gmail.com", password: "tinyapp2" },
+  [userId1]: {
+    ID: userId1,
+    email: "brandt@gmail.com",
+    password: bcrypt.hashSync("tinyapp1"),
+  },
+  [userId2]: {
+    ID: userId2,
+    email: "seibel@gmail.com",
+    password: bcrypt.hashSync("tinyapp2"),
+  },
 };
 
 // Route to render login page
@@ -150,7 +159,7 @@ app.post("/login", (req, res) => {
     //Check if the user exists by email
     if (user.email === email) {
       foundUser = user;
-      if (user.password === password) {
+      if (bcrypt.compareSync(password, user.password)) {
         req.session.username = email;
         // Redirect to /urls after successful login
         return res.redirect("/urls");
