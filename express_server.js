@@ -28,21 +28,6 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
-// POST route to handle new URLs
-app.post("/urls", (req, res) => {
-  // Extract the long URL from the request body
-  const longURL = req.body.longURL;
-
-  // Generate a random short URL ID
-  const shortURL = generateRandomString(6);
-
-  // Save the mapping to the URL database
-  urlDatabase[shortURL] = longURL;
-
-  // Redirect to the page showing the new URL
-  res.redirect(`/urls/${shortURL}`);
-});
-
 // Route to render login page
 app.get("/login", (req, res) => {
   if (req.cookies.username) {
@@ -59,6 +44,12 @@ app.get("/", (req, res) => {
   } else {
     res.redirect(`/login`);
   }
+});
+
+// Middleware to check if the user is logged in
+app.use((req, res, next) => {
+  res.locals.loggedIn = !!req.cookies.username;
+  next();
 });
 
 // Route to render list of URLs
@@ -86,7 +77,6 @@ app.get("/urls/:id", (req, res) => {
 });
 
 // Redirect any request to "/u/:id" to its longURL
-
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
   const longURL = urlDatabase[id];
@@ -97,6 +87,7 @@ app.get("/u/:id", (req, res) => {
     res.status(404).send("URL not found");
   }
 });
+
 // POST route to handle deletion of a URL resource
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
@@ -112,6 +103,7 @@ app.post("/urls/:id/delete", (req, res) => {
     res.status(404).send("URL not found");
   }
 });
+
 // POST route to update a URL resource
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
@@ -128,6 +120,7 @@ app.post("/urls/:id", (req, res) => {
     res.status(404).send("URL not found");
   }
 });
+
 // POST route to handle login
 app.post("/login", (req, res) => {
   const username = req.body.username; // Get the username from the request body
@@ -138,13 +131,20 @@ app.post("/login", (req, res) => {
   // Redirect the browser back to the /urls page
   res.redirect("/urls");
 });
-app.get("/urls", (req, res) => {
-  const templateVars = {
-    username: req.cookies["username"],
-    // ... any other vars
-  };
-  res.render("urls_index", templateVars);
+
+// POST route to handle login
+app.post("/login", (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  // Here you would typically validate the email and password
+  // For now, let's just set a cookie with the username/email
+  res.cookie("username", email);
+
+  // Redirect to /urls after successful login
+  res.redirect("/urls");
 });
+
 // POST route to handle logout
 app.post("/logout", (req, res) => {
   // Clear the username cookie
