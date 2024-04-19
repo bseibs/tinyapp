@@ -54,7 +54,7 @@ app.use((req, res, next) => {
 
 // Route to render list of URLs
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = { urls: urlDatabase, username: req.cookies.username };
   res.render("urls_index", templateVars);
 });
 
