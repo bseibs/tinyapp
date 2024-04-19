@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const PORT = 8080;
-const cookieParser = require("cookie-parser");
+const cookieSession = require("cookie-session");
 
 // Function to generate a random alphanumeric string
 function generateRandomString(length) {
@@ -15,12 +15,22 @@ function generateRandomString(length) {
   return randomString;
 }
 
+// CookieSession middleware
+app.use(
+  cookieSession({
+    name: "session",
+    keys: ["tinyapp1", "tinyapp2"],
+
+    // Cookie Options
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  })
+);
+
 // Set view engine to EJS
 app.set("view engine", "ejs");
 
 // Middleware to parse URL-encoded bodies
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 
 // URL database
 const urlDatabase = {
@@ -30,7 +40,7 @@ const urlDatabase = {
 
 // Route to render login page
 app.get("/login", (req, res) => {
-  if (req.cookies.username) {
+  if (req.session.username) {
     res.redirect(`/urls`);
   } else {
     res.render(`login`);
@@ -39,22 +49,23 @@ app.get("/login", (req, res) => {
 
 // Route to render homepage
 app.get("/", (req, res) => {
-  if (req.cookies.username) {
+  if (req.session.username) {
     res.redirect(`/urls`);
   } else {
     res.redirect(`/login`);
   }
 });
+// Route to render a register page
 
 // Middleware to check if the user is logged in
 app.use((req, res, next) => {
-  res.locals.loggedIn = !!req.cookies.username;
+  res.locals.loggedIn = !!req.session.username;
   next();
 });
 
 // Route to render list of URLs
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies.username };
+  const templateVars = { urls: urlDatabase, username: req.session.username };
   res.render("urls_index", templateVars);
 });
 
@@ -128,7 +139,7 @@ app.post("/login", (req, res) => {
 
   // Here you would typically validate the email and password
   // For now, let's just set a cookie with the username/email
-  res.cookie("username", email);
+  req.session.username = email;
 
   // Redirect to /urls after successful login
   res.redirect("/urls");
@@ -137,7 +148,7 @@ app.post("/login", (req, res) => {
 // POST route to handle logout
 app.post("/logout", (req, res) => {
   // Clear the username cookie
-  res.clearCookie("username");
+  req.session = null;
 
   // Redirect the user back to the /urls page
   res.redirect("/urls");
