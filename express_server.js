@@ -33,12 +33,6 @@ app.set("view engine", "ejs");
 // Middleware to parse URL-encoded bodies
 app.use(express.urlencoded({ extended: true }));
 
-// URL database
-const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
-};
-
 const userId1 = generateRandomString(6);
 const userId2 = generateRandomString(6);
 // Users Database
@@ -52,6 +46,20 @@ const users = {
     ID: userId2,
     email: "seibel@gmail.com",
     password: bcrypt.hashSync("tinyapp2"),
+  },
+};
+
+// URL database
+const urlDatabase = {
+  b2xVn2: {
+    longUrl: "http://www.lighthouselabs.ca",
+    shortUrl: "b2xVn2",
+    userId: userId2,
+  },
+  "9sm5xK": {
+    longUrl: "http://www.google.com",
+    shortUrl: "9sm5xK",
+    userId: userId1,
   },
 };
 
@@ -165,6 +173,28 @@ app.post("/urls/:id/delete", (req, res) => {
     // If the URL doesn't exist, send a 404 error response
     res.status(404).send("URL not found");
   }
+});
+
+// POST route to create a new URL
+app.post("/urls", (req, res) => {
+  const longUrl = req.body.longURL;
+  const shortUrl = generateRandomString(6);
+  const email = req.session.username;
+  let foundUser;
+  for (userId in users) {
+    const user = users[userId];
+    //Check if the user exists by email
+    if (user.email === email) {
+      foundUser = user;
+    }
+  }
+  const userId = foundUser.ID;
+
+  const newUrl = { longUrl: longUrl, shortUrl: shortUrl, userId: foundUser.ID };
+  // users[newUser.ID] = newUser;
+  urlDatabase[newUrl.shortUrl] = newUrl;
+  console.log(urlDatabase);
+  res.redirect(`/urls/${shortUrl}`);
 });
 
 // POST route to update a URL resource
